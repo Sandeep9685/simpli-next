@@ -4,13 +4,26 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { LogOut, BookOpen, Award } from "lucide-react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { LogOut, BookOpen, Award, User, Settings, Edit, ChevronDown } from "lucide-react"
 
 interface DashboardUser {
   id: number
   email: string
   name: string
   role: string
+  phone?: string
+  bio?: string
+  location?: string
+  occupation?: string
+  company?: string
 }
 
 export default function DashboardPage() {
@@ -49,6 +62,10 @@ export default function DashboardPage() {
     router.push("/")
   }
 
+  const handleEditProfile = () => {
+    router.push("/profile/edit")
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -68,14 +85,45 @@ export default function DashboardPage() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-blue-600">LearnTech Dashboard</h1>
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <BookOpen className="w-4 h-4" />
-              <span className="text-sm text-gray-600">{user.name}</span>
-            </div>
-            <Button variant="outline" onClick={handleLogout} size="sm">
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
+            {/* User Profile Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="flex items-center space-x-2 hover:bg-gray-100">
+                  <Avatar className="w-8 h-8">
+                    <AvatarImage src={user.avatar || "/placeholder.svg"} />
+                    <AvatarFallback>
+                      {user.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")
+                        .toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm text-gray-700">{user.name}</span>
+                  <ChevronDown className="w-4 h-4 text-gray-500" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="px-2 py-1.5">
+                  <p className="text-sm font-medium">{user.name}</p>
+                  <p className="text-xs text-gray-500">{user.email}</p>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleEditProfile}>
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Settings className="w-4 h-4 mr-2" />
+                  Settings
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>
@@ -85,6 +133,52 @@ export default function DashboardPage() {
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome back, {user.name}!</h2>
           <p className="text-gray-600">Continue your learning journey</p>
+          {user.occupation && (
+            <p className="text-sm text-blue-600 mt-1">
+              {user.occupation} {user.company && `at ${user.company}`}
+            </p>
+          )}
+        </div>
+
+        {/* Profile Summary Card */}
+        <div className="mb-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span className="flex items-center">
+                  <User className="w-5 h-5 mr-2" />
+                  Profile Summary
+                </span>
+                <Button variant="outline" size="sm" onClick={handleEditProfile}>
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit Profile
+                </Button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-start space-x-4">
+                <Avatar className="w-16 h-16">
+                  <AvatarImage src={user.avatar || "/placeholder.svg"} />
+                  <AvatarFallback className="text-lg">
+                    {user.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold">{user.name}</h3>
+                  <p className="text-gray-600">{user.email}</p>
+                  {user.location && <p className="text-sm text-gray-500">{user.location}</p>}
+                  {user.bio && <p className="text-sm text-gray-700 mt-2">{user.bio}</p>}
+                  {!user.bio && (
+                    <p className="text-sm text-gray-400 mt-2 italic">Add a bio to tell others about yourself</p>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
@@ -114,13 +208,13 @@ export default function DashboardPage() {
 
           <Card>
             <CardHeader>
-              <BookOpen className="w-8 h-8 text-purple-600 mb-2" />
+              <User className="w-8 h-8 text-purple-600 mb-2" />
               <CardTitle>Profile</CardTitle>
               <CardDescription>Account settings</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-gray-600">Role: {user.role}</p>
-              <p className="text-sm text-gray-600">Email: {user.email}</p>
+              <p className="text-sm text-gray-600">Status: Active</p>
             </CardContent>
           </Card>
         </div>
@@ -137,8 +231,8 @@ export default function DashboardPage() {
               <Award className="w-6 h-6" />
               <span>View Certificates</span>
             </Button>
-            <Button variant="outline" className="h-20 flex-col space-y-2 bg-transparent">
-              <BookOpen className="w-6 h-6" />
+            <Button variant="outline" className="h-20 flex-col space-y-2 bg-transparent" onClick={handleEditProfile}>
+              <Edit className="w-6 h-6" />
               <span>Edit Profile</span>
             </Button>
             <Button
