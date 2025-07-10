@@ -17,7 +17,7 @@ export default function CourseLandingPage() {
             <a href="https://www.simplilearn.com/courses" className="text-gray-600 hover:text-blue-600">
               Courses
             </a>
-            <a href="https://www.simplilearn.com/about-us" className="text-gray-600 hover:text-blue-600">
+            <a href="https://www.simplilearn.com/about-us" target="_blank" className="text-gray-600 hover:text-blue-600">
               About
             </a>
             <a href="https://www.simplilearn.com/contact-us" className="text-gray-600 hover:text-blue-600">
